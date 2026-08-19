@@ -1,0 +1,44 @@
+name: Validate
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    steps:
+      - run: |
+          git config --global url."https://oauth2:${SERVICE_USER_GITHUB_TOKEN}@github.com/akm-solutions/".insteadOf https://github.com/akm-solutions/
+        shell: bash
+        env:
+          SERVICE_USER_GITHUB_TOKEN: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          # SonarCloud's PR analysis needs full git history to correctly
+          # blame/attribute lines as new-vs-existing - a shallow clone
+          # (actions/checkout's default) causes it to misattribute
+          # pre-existing code as "new", exactly what happened here.
+          fetch-depth: 0
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.7"
+
+      - uses: akm-solutions/akm-actions/pre-commit-terraform@main
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
