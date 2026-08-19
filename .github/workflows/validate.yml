@@ -16,22 +16,16 @@ jobs:
   deploy:
     runs-on: ubuntu-24.04
     steps:
-      - run: |
-          git config --global url."https://oauth2:${SERVICE_USER_GITHUB_TOKEN}@github.com/akm-solutions/".insteadOf https://github.com/akm-solutions/
-        shell: bash
-        env:
-          SERVICE_USER_GITHUB_TOKEN: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
-
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.9.7"
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.11"
 
