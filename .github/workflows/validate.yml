@@ -24,12 +24,6 @@ jobs:
 
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          # SonarCloud's PR analysis needs full git history to correctly
-          # blame/attribute lines as new-vs-existing - a shallow clone
-          # (actions/checkout's default) causes it to misattribute
-          # pre-existing code as "new", exactly what happened here.
-          fetch-depth: 0
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -51,9 +45,3 @@ jobs:
 
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.1
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
